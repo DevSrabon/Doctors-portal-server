@@ -47,6 +47,9 @@ async function run() {
 		const usersCollection = client
 			.db("doctorsPortal")
 			.collection("usersCollection");
+		const doctorsCollection = client
+			.db("doctorsPortal")
+			.collection("doctors");
 
 		// Use Aggregate to query multiple collection and then merge data
 		app.get("/appointmentOptions", async (req, res) => {
@@ -69,7 +72,13 @@ async function run() {
 				console.log(date, option.name, remainingSlots.length);
 			});
 			res.send(options);
-		});
+        });
+        
+        app.get('/appointmentSpecialty', async (req, res) => {
+            const query = {};
+            const result = await appointmentCollection.find(query).project({name: 1}).toArray();
+            res.send(result)
+        })
 
         // optional
 		app.get("/v2/appointmentOptions", async (req, res) => {
@@ -196,6 +205,18 @@ async function run() {
         app.post('/users', async (req, res) => {
             const user = req.body;
             const result = await usersCollection.insertOne(user);
+            res.send(result);
+        });
+
+        app.get('/doctors', async (req, res) => {
+            const query = {};
+            const doctors = await doctorsCollection.find(query).toArray();
+            res.send(doctors)
+        })
+
+        app.post('/doctors', async (req, res) => {
+            const doctor = req.body;
+            const result = await doctorsCollection.insertOne(doctor);
             res.send(result);
         });
 	} finally {
